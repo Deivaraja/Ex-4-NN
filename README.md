@@ -123,29 +123,19 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00236/seeds_dataset.txt'
-
-names = [
-    'Area',
-    'Perimeter',
-    'Compactness',
-    'Length_of_kernel',
-    'Width_of_kernel',
-    'Asymmetry_coefficient',
-    'Length_of_kernel_groove',
-    'Class'
-]
-
-seedsdata = pd.read_csv(url, sep=r'\s+', header=None, names=names)
+# Load Seeds Dataset CSV
+seedsdata = pd.read_csv('seeds_dataset.csv')
 
 print(seedsdata.head())
 
+# Separate input and output
 X = seedsdata.iloc[:, 0:7]
 
 y = seedsdata[['Class']].copy()
 
+# Convert class numbers into variety names
 y['Class'] = y['Class'].map({
     1: 'Kama',
     2: 'Rosa',
@@ -157,12 +147,14 @@ print(y.head())
 
 print(y.Class.unique())
 
+# Label Encoding
 le = preprocessing.LabelEncoder()
 
 y = y.apply(le.fit_transform)
 
 print(y.head())
 
+# Split dataset into training and testing
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -171,6 +163,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=y
 )
 
+# Feature Scaling
 scaler = StandardScaler()
 
 scaler.fit(X_train)
@@ -179,20 +172,28 @@ X_train = scaler.transform(X_train)
 
 X_test = scaler.transform(X_test)
 
+# Create MLP Classifier
 mlp = MLPClassifier(
     hidden_layer_sizes=(10, 10, 10),
     max_iter=1000,
     random_state=42
 )
 
+# Train the model
 mlp.fit(X_train, y_train.values.ravel())
 
+# Make Predictions
 predictions = mlp.predict(X_test)
 
+print("Predictions:")
 print(predictions)
 
+# Confusion Matrix
+print("Confusion Matrix:")
 print(confusion_matrix(y_test, predictions))
 
+# Classification Report
+print("Classification Report:")
 print(
     classification_report(
         y_test,
@@ -200,10 +201,17 @@ print(
         target_names=le.classes_
     )
 )
+
+# Accuracy
+accuracy = accuracy_score(y_test, predictions)
+
+print("Model Accuracy:", accuracy * 100, "%")
 ```
 
 <H3>Output:</H3>
-<img width="652" height="1030" alt="image" src="https://github.com/user-attachments/assets/e6f37fb2-bcbe-4acd-b968-15eddc879bbf" />
+<img width="802" height="566" alt="image" src="https://github.com/user-attachments/assets/95bbe2bc-9eba-4ec7-8b93-fcc5fccf58aa" />
+<img width="831" height="760" alt="image" src="https://github.com/user-attachments/assets/c38e290d-5185-4cd1-81a3-9fcdadd4349e" />
 
+ 
 <H3>Result:</H3>
 Thus, MLP is implemented for multi-classification using python.
